@@ -4,10 +4,13 @@ import QuickActions from "../../components/dashboard/QuickActions";
 import StockAlerts from "../../components/dashboard/StockAlerts";
 import CategoryProgress from "../../components/dashboard/CategoryProgress";
 import { cardDashboard } from "@/const/const";
+import Navbar from "@/components/navbar/Navbar";
 
 const Dashboard = () => {
   return (
-    <div className="p-8 bg-slate-50 min-h-screen">
+    <div className="min-h-screen flex bg-slate-50">
+      <Navbar />
+      <main className="flex-1 p-8">
       {/* cabecera */}
       <div className="mb-8">
         <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tight">
@@ -50,6 +53,7 @@ const Dashboard = () => {
           <CategoryProgress />
         </div>
       </div>
+      </main>
     </div>
   );
 };
