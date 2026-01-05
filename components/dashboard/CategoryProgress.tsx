@@ -1,5 +1,5 @@
 import React from "react";
-import { inventarioCategorias } from "@/const/const";
+import { inventarioCategorias } from "@/constants";
 
 const CategoryProgress = () => {
   return (

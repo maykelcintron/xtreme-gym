@@ -1,4 +1,4 @@
-import { movimientosRecientes } from "@/const/const";
+import { movimientosRecientes } from "@/constants";
 
 const RecentMovements = () => {
   return (

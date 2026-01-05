@@ -1,5 +1,5 @@
 import React from "react";
-import { accionesRapidas } from "@/const/const";
+import { accionesRapidas } from "@/constants";
 
 const QuickActions = () => {
   return (
