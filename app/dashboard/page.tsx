@@ -3,7 +3,7 @@ import RecentMovements from "../../components/dashboard/RecentMovements";
 import QuickActions from "../../components/dashboard/QuickActions";
 import StockAlerts from "../../components/dashboard/StockAlerts";
 import CategoryProgress from "../../components/dashboard/CategoryProgress";
-import { cardDashboard } from "@/const/const";
+import { cardDashboard } from "@/constants";
 import Navbar from "@/components/navbar/Navbar";
 
 const Dashboard = () => {

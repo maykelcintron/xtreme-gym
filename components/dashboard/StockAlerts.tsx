@@ -1,5 +1,5 @@
 import React from "react";
-import { alertasStock } from "@/const/const";
+import { alertasStock } from "@/constants";
 import { AlertTriangle, Box } from "lucide-react";
 
 const colorStyles: Record<string, string> = {
