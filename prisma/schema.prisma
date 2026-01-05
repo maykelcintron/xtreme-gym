@@ -6,9 +6,52 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// 1. Modelo de Usuarios
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación con Rol
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+}
+
+// 2. Modelo de Roles (Admin, Staff, Cliente, etc.)
+model Role {
+  id    String @id @default(cuid())
+  name  String @unique // Ej: "ADMIN", "STAFF"
+  users User[]
+}
+
+// 3. Modelo de Productos
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  stock       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relación con Categoría
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+}
+
+// 4. Modelo de Categoría
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique // Ej: "Suplementos", "Bebidas", "Snacks"
+  products Product[]
 }
