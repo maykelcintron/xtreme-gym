@@ -1,0 +1,15 @@
+services:
+  db_xtreme_gym:
+    image: postgres:18-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${DOCKER_POSTGRES_ROOT_USER}
+      POSTGRES_PASSWORD: ${DOCKER_POSTGRES_ROOT_PASSWORD}
+      POSTGRES_DB: ${DOCKER_POSTGRES_DB}
+    volumes:
+      - data_xtreme_gym:/var/lib/postgresql
+    ports:
+      - 5433:5432
+
+volumes:
+  data_xtreme_gym:
