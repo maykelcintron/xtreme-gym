@@ -13,30 +13,25 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 // 1. Modelo de Usuarios
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   name      String
   email     String   @unique
   password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Relación con Rol
-  roleId    String
-  role      Role     @relation(fields: [roleId], references: [id])
-}
-
-// 2. Modelo de Roles (Admin, Staff, Cliente, etc.)
-model Role {
-  id    String @id @default(cuid())
-  name  String @unique // Ej: "ADMIN", "STAFF"
-  users User[]
 }
 
 // 3. Modelo de Productos
 model Product {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String
   price       Float
   stock       Int      @default(0)
@@ -51,7 +46,7 @@ model Product {
 
 // 4. Modelo de Categoría
 model Category {
-  id       String    @id @default(cuid())
+  id       String    @id @default(uuid())
   name     String    @unique // Ej: "Suplementos", "Bebidas", "Snacks"
-  products Product[]
+  products Product[]  
 }

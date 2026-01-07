@@ -2,15 +2,29 @@ import Image from "next/image";
 import InputField from "./InputField";
 import { AuthFormData } from "@/interfaces";
 import LinkNavigation from "./LinkNavigation";
+import { authenticate } from "@/actions/actions";
+import { useActionState, startTransition } from "react";
+import { redirect } from "next/navigation";
 
 const LoginForm = ({register, handleSubmit, errors} : any) => {
+    const [state, formAction, isPending] = useActionState(authenticate, undefined)
 
-    const onSubmit = (data: AuthFormData) => {
-        console.log("submit", data);
-    };
+    if (state === 'Success') return redirect('/dashboard');
+
+    const onSubmit = handleSubmit((data: AuthFormData) => {
+        // Crear FormData a partir de los datos validados
+        const formData = new FormData();
+        formData.append('email', data.email);
+        formData.append('password', data.password);
+        
+        // Llamar al formAction con FormData dentro de startTransition
+        startTransition(() => {
+            formAction(formData);
+        });
+    });
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-black p-4 rounded-md w-117.5 space-y-4">
+        <form onSubmit={onSubmit} className="bg-black p-4 rounded-md w-117.5 space-y-4">
             <div className="flex justify-center items-center">
                 <Image
                     src="/logo.jpeg"
@@ -26,7 +40,7 @@ const LoginForm = ({register, handleSubmit, errors} : any) => {
                 placeholder="Ingresa tu email"
                 error={errors.email?.message}
                 {...register("email", {
-                    required: "El email es obligatorio",
+                    required: "* El email es obligatorio",
                     pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                         message: "Email inválido"
@@ -40,7 +54,7 @@ const LoginForm = ({register, handleSubmit, errors} : any) => {
                 placeholder="Ingresa tu contraseña"
                 error={errors.password?.message}
                 {...register("password", {
-                    required: "La contraseña es obligatoria"
+                    required: "* La contraseña es obligatoria"
                 })}
             />
 

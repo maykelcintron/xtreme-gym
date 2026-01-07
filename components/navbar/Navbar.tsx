@@ -1,7 +1,7 @@
 "use client"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import ActiveLink from "./ActiveLink"
+import { logout } from "@/actions/logout"
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: "M3 12h18M3 6h18M3 18h18" },
@@ -43,12 +43,12 @@ const Navbar = () => {
       <div className="text-xs text-gray-400 px-2">
         <div className="mb-4">Version</div>
         <div className="mb-6 text-white">XTREME 1.0.0</div>
-        <Link href="/logout" className="flex items-center gap-2 text-gray-300 hover:text-white">
+        <button onClick={() => logout()} className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7" />
           </svg>
           Cerrar Sesión
-        </Link>
+        </button>
       </div>
     </aside>
   )

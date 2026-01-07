@@ -5,8 +5,14 @@ import StockAlerts from "../../components/dashboard/StockAlerts";
 import CategoryProgress from "../../components/dashboard/CategoryProgress";
 import { cardDashboard } from "@/constants";
 import Navbar from "@/components/navbar/Navbar";
+import { auth } from "@/auth.config";
+import { redirect } from "next/navigation";
 
-const Dashboard = () => {
+const Dashboard = async () => {
+  const session = await auth();
+  
+  if (!session?.user) return redirect("/auth/login");
+
   return (
     <div className="min-h-screen flex bg-slate-50">
       <Navbar />

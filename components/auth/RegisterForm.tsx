@@ -6,12 +6,12 @@ import LinkNavigation from "./LinkNavigation";
 
 const RegisterForm = ({register, handleSubmit, errors} : any) => {
 
-    const onSubmit = (data: AuthFormData) => {
-        console.log("submit", data);
-    };
+    // const onSubmit = (data: AuthFormData) => {
+    //     console.log("submit", data);
+    // };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-black p-4 rounded-md w-117.5 space-y-4">
+        <form className="bg-black p-4 rounded-md w-117.5 space-y-4">
             <div className="flex justify-center items-center">
                 <Image
                     src="/logo.jpeg"
@@ -27,7 +27,7 @@ const RegisterForm = ({register, handleSubmit, errors} : any) => {
                 placeholder="Ingresa tu nombre de usuario"
                 error={errors.username?.message}
                 {...register("username", {
-                    required: "El Nombre de usuario es obligatorio",
+                    required: "* El Nombre de usuario es obligatorio",
                     minLength: {
                         value: 3,
                         message: "Mínimo 3 carácteres"
@@ -41,7 +41,7 @@ const RegisterForm = ({register, handleSubmit, errors} : any) => {
                 placeholder="Ingresa tu email"
                 error={errors.email?.message}
                 {...register("email", {
-                    required: "El email es obligatorio",
+                    required: "* El email es obligatorio",
                     pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                         message: "Email inválido"
@@ -55,7 +55,7 @@ const RegisterForm = ({register, handleSubmit, errors} : any) => {
                 placeholder="Ingresa tu contraseña"
                 error={errors.password?.message}
                 {...register("password", {
-                    required: "La contraseña es obligatoria",
+                    required: "* La contraseña es obligatoria",
                     minLength: {
                         value: 6,
                         message: "Mínimo 6 carácteres"

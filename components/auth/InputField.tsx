@@ -20,12 +20,13 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         <input
           ref={ref}
           type={type}
+          name={type}
           placeholder={placeholder}
           className={`p-2 text-[16px] rounded-md text-gray-800 w-full outline-none ${
             type === "submit" 
               ? "bg-red-600 text-white font-medium hover:cursor-pointer hover:bg-red-500 transition-colors duration-300" 
               : error 
-                ? "border-2 border-red-500 bg-white" 
+                ? "border-3 border-red-500 bg-white" 
                 : "bg-white"
           }`}
           {...props}
