@@ -28,17 +28,16 @@ const Navbar = () => {
 
   return (
     <>
-      {/* BOTÓN HAMBURGUESA: visible solo en móvil */}
+      {/* BOTÓN HAMBURGUESA */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 bg-black text-white rounded-lg border border-gray-800 shadow-xl"
+          className="p-2 bg-black text-white rounded-lg border border-gray-800 shadow-xl active:scale-95 transition-transform"
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* ASIDE RESPONSIVO */}
       <aside
         className={`
         fixed inset-y-0 left-0 z-40 w-64 bg-black text-gray-200 flex flex-col justify-between p-6 shrink-0
@@ -48,18 +47,15 @@ const Navbar = () => {
       `}
       >
         <div>
-          {/* LOGO: Se oculta en móvil (hidden) y aparece en desktop (md:flex) */}
+          {/* LOGO ESCRITORIO (Se oculta en móvil) */}
           <div className="hidden md:flex mb-2 -mt-4 px-2 flex-col items-center justify-center">
-            <div className="inline-block">
-              <img
-                src="/logo-removebg-preview.png"
-                alt="XTREME GYM"
-                className="h-52 w-52 object-contain -my-10 bg-transparent"
-              />
-            </div>
+            <img
+              src="/logo-removebg-preview.png"
+              alt="XTREME GYM"
+              className="h-52 w-52 object-contain -my-10"
+            />
           </div>
 
-          {/* Espaciado superior extra en móvil para que el botón X no tape el primer link */}
           <div className="h-12 md:hidden" />
 
           <nav className="space-y-1">
@@ -89,31 +85,42 @@ const Navbar = () => {
         </div>
 
         {/* FOOTER DEL ASIDE */}
-        <div className="text-[10px] text-gray-500 px-2 uppercase tracking-widest font-bold">
-          <div className="mb-2">Sistema de Control</div>
-          <div className="mb-6 text-white text-xs">XTREME v1.0.0</div>
+        <div>
+          {/* LOGO MÓVIL (Solo aparece cuando isOpen es true en móvil) */}
+          <div className="flex md:hidden mb-4 justify-start">
+            <img
+              src="/logo-removebg-preview.png"
+              alt="XTREME GYM"
+              className="h-32 w-32 object-contain -my-6"
+            />
+          </div>
 
-          <button
-            onClick={() => logout()}
-            className="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-red-500 transition-colors group w-full"
-          >
-            <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-red-500/10">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-            </div>
-            <span className="text-sm">Cerrar Sesión</span>
-          </button>
+          <div className="text-[10px] text-gray-500 px-2 uppercase tracking-widest font-bold">
+            <div className="mb-1">Sistema de Control</div>
+            <div className="mb-6 text-white text-xs">XTREME v1.0.0</div>
+
+            <button
+              onClick={() => logout()}
+              className="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-red-500 transition-colors group w-full"
+            >
+              <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-red-500/10">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              </div>
+              <span className="text-sm">Cerrar Sesión</span>
+            </button>
+          </div>
         </div>
       </aside>
 

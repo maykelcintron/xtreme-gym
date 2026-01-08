@@ -2,188 +2,272 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/navbar/Navbar";
 import InventoryHeader from "@/components/inventory/InventoryHeader";
-import InventoryTable from "@/components/inventory/InventoryTable";
-import Pagination from "@/components/inventory/Pagination";
-import ProductSidePanel from "@/components/inventory/ProductSidePanel";
+import InventorySidePanel from "@/components/inventory/ProductSidePanel";
 import {
   getInventoryAction,
   getCategoriesAction,
+  createCategoryAction,
+  deleteCategoryAction,
   saveProductAction,
   deleteProductAction,
-  createCategoryAction,
 } from "@/actions/actions";
+import {
+  Package,
+  Edit2,
+  Trash2,
+  AlertCircle,
+  AlertTriangle,
+  X,
+} from "lucide-react";
 
 export default function InventoryPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Todos");
-  const [filterCategory, setFilterCategory] = useState("Todas");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [loading, setLoading] = useState(true);
 
-  const refreshData = async () => {
-    const [prodRes, catRes] = await Promise.all([
-      getInventoryAction(),
-      getCategoriesAction(),
-    ]);
+  // Estados de Filtros
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("Todos");
+  const [categoryFilter, setCategoryFilter] = useState("Todas");
 
-    if (prodRes.success && prodRes.data) {
-      setProducts(prodRes.data);
-    } else {
-      setProducts([]);
-    }
+  // Estados de Modales
+  const [isProductPanelOpen, setIsProductPanelOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<any>(null);
 
-    if (catRes.success && catRes.data) {
-      setCategories(catRes.data);
+  // NUEVO: Estado para el modal de confirmación de producto
+  const [productToDelete, setProductToDelete] = useState<any | null>(null);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [prodRes, catRes] = await Promise.all([
+        getInventoryAction(),
+        getCategoriesAction(),
+      ]);
+      if (prodRes.success) setProducts(prodRes.data || []);
+      if (catRes.success) setCategories(catRes.data || []);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    refreshData();
+    loadData();
   }, []);
 
-  const handleAddCategory = async (catName: string) => {
-    const res = await createCategoryAction(catName);
-    if (res.success) await refreshData();
+  const handleAddCategory = async (name: string) => {
+    const res = await createCategoryAction(name);
+    if (res.success) await loadData();
   };
 
-  const handleDeleteCategory = async (catName: string) => {
-    await refreshData();
+  const handleDeleteCategory = async (name: string) => {
+    const res = await deleteCategoryAction(name);
+    if (res.success) await loadData();
+    return res;
   };
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      filterStatus === "Todos" ||
-      (filterStatus === "Disponible" && product.isActive) ||
-      (filterStatus === "No Disponible" && !product.isActive);
-    const matchesCategory =
-      filterCategory === "Todas" || product.category === filterCategory;
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
-
-  const currentItems = filteredProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleSaveProduct = async (data: any) => {
-    const res = await saveProductAction(data, editingProduct?.id);
-    if (res.success) {
-      await refreshData();
-      setIsPanelOpen(false);
-    }
-  };
-
-  const handleDeleteProduct = async (id: string) => {
-    // Añadimos la confirmación nativa del navegador
-    const isConfirmed = window.confirm(
-      "¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
-    );
-
-    if (isConfirmed) {
-      try {
-        const res = await deleteProductAction(id);
-        if (res.success) {
-          await refreshData(); // Recarga la lista
-          // Opcional: podrías añadir un alert de éxito o un toast aquí
-        } else {
-          alert("Error al eliminar el producto.");
-        }
-      } catch (error) {
-        console.error("Error en la eliminación:", error);
-        alert("Ocurrió un error inesperado.");
+  // NUEVO: Función de borrado final sin confirm() del navegador
+  const confirmDeleteProduct = async () => {
+    if (productToDelete) {
+      const res = await deleteProductAction(productToDelete.id);
+      if (res.success) {
+        setProductToDelete(null);
+        await loadData();
       }
     }
   };
 
+  const filteredProducts = products.filter((p) => {
+    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus =
+      statusFilter === "Todos"
+        ? true
+        : statusFilter === "Disponible"
+        ? p.isActive
+        : !p.isActive;
+    const matchesCategory =
+      categoryFilter === "Todas" ? true : p.category === categoryFilter;
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
   return (
-    // Estructura responsiva: Columna en móvil, Fila en escritorio
     <div className="flex flex-col md:flex-row min-h-screen bg-slate-50">
       <Navbar />
 
-      <main className="flex-1 w-full overflow-x-hidden p-4 sm:p-6 md:p-8">
+      <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8 w-full">
         <div className="max-w-1600px mx-auto space-y-6">
-          {/* TÍTULO */}
-          <div className="flex flex-col gap-1">
-            <h1 className="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tight">
-              Inventario
-            </h1>
-            <p className="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-widest">
-              Gestión de existencias y categorías
-            </p>
-          </div>
-
-          {/* HEADER (Buscador y Filtros) */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
             <InventoryHeader
               categories={categories}
+              currentCategory={categoryFilter}
+              currentStatus={statusFilter}
+              onSearch={setSearch}
+              onCategoryChange={setCategoryFilter}
+              onStatusChange={setStatusFilter}
               onAddCategory={handleAddCategory}
               onDeleteCategory={handleDeleteCategory}
-              onSearch={(val) => {
-                setSearchTerm(val);
-                setCurrentPage(1);
-              }}
-              onStatusChange={(val) => {
-                setFilterStatus(val);
-                setCurrentPage(1);
-              }}
-              onCategoryChange={(val) => {
-                setFilterCategory(val);
-                setCurrentPage(1);
-              }}
-              currentStatus={filterStatus}
-              currentCategory={filterCategory}
               onOpenModal={() => {
-                setEditingProduct(null);
-                setIsPanelOpen(true);
+                setProductToEdit(null);
+                setIsProductPanelOpen(true);
               }}
             />
-          </div>
 
-          {/* TABLA CON SCROLL HORIZONTAL */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              {/* min-w-[800px] asegura que en móviles la tabla no se colapse y sea legible con scroll */}
-              <div className="min-w-800px lg:min-w-full">
-                <InventoryTable
-                  products={currentItems}
-                  onEdit={(p) => {
-                    setEditingProduct(p);
-                    setIsPanelOpen(true);
-                  }}
-                  onDelete={handleDeleteProduct}
-                />
-              </div>
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-slate-50/50 border-y border-slate-100">
+                  <tr>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">
+                      Producto
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">
+                      Categoría
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">
+                      Precio
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">
+                      Stock
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {loading ? (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="py-20 text-center text-slate-400 font-bold uppercase text-xs"
+                      >
+                        Cargando...
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredProducts.map((p) => (
+                      <tr
+                        key={p.id}
+                        className="hover:bg-slate-50/50 transition-colors group"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-black group-hover:text-white transition-all">
+                              <Package size={20} />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-bold text-slate-700">
+                                {p.name}
+                              </span>
+                              <span
+                                className={`text-[9px] font-black uppercase ${
+                                  p.isActive
+                                    ? "text-emerald-500"
+                                    : "text-slate-300"
+                                }`}
+                              >
+                                {p.isActive ? "• Disponible" : "• Inactivo"}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-[10px] font-black bg-slate-100 px-2 py-1 rounded-md text-slate-500 uppercase">
+                            {p.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-bold text-slate-600">
+                          ${p.price.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 text-center font-black text-sm">
+                          {p.stock}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex justify-center gap-2">
+                            <button
+                              onClick={() => {
+                                setProductToEdit(p);
+                                setIsProductPanelOpen(true);
+                              }}
+                              className="p-2 text-slate-400 hover:text-black hover:bg-slate-100 rounded-xl transition-all"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => setProductToDelete(p)} // Abre el modal de confirmación
+                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-          </div>
-
-          {/* PAGINACIÓN */}
-          <div className="flex justify-center md:justify-end">
-            <Pagination
-              totalItems={filteredProducts.length}
-              itemsPerPage={itemsPerPage}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-            />
           </div>
         </div>
       </main>
 
-      {/* PANEL LATERAL */}
-      {isPanelOpen && (
-        <ProductSidePanel
-          categories={categories}
-          productToEdit={editingProduct}
-          onClose={() => setIsPanelOpen(false)}
-          onSave={handleSaveProduct}
-        />
+      {/* MODAL DE CONFIRMACIÓN DE ELIMINACIÓN DE PRODUCTO */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setProductToDelete(null)}
+          />
+          <div className="relative bg-white w-full max-w-[320px] rounded-[2.5rem] p-8 shadow-2xl text-center animate-in fade-in zoom-in duration-300">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-5 shadow-inner">
+              <AlertTriangle size={32} />
+            </div>
+
+            <h4 className="text-sm font-black uppercase text-slate-800 mb-2">
+              Eliminar Producto
+            </h4>
+            <p className="text-[10px] font-bold text-slate-400 uppercase leading-relaxed mb-8 px-2">
+              ¿Estás seguro de quitar{" "}
+              <span className="text-red-500 font-black">
+                "{productToDelete.name}"
+              </span>{" "}
+              del inventario? Esta acción es permanente.
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={confirmDeleteProduct}
+                className="w-full py-4 bg-red-500 text-white text-[10px] font-black uppercase rounded-2xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all active:scale-95"
+              >
+                Sí, eliminar producto
+              </button>
+              <button
+                onClick={() => setProductToDelete(null)}
+                className="w-full py-4 text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all"
+              >
+                No, cancelar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
+
+      <InventorySidePanel
+        isOpen={isProductPanelOpen}
+        categories={categories}
+        productToEdit={productToEdit}
+        onClose={() => {
+          setIsProductPanelOpen(false);
+          setProductToEdit(null);
+        }}
+        onSave={async (data) => {
+          const res = await saveProductAction(data, productToEdit?.id);
+          if (res.success) {
+            setIsProductPanelOpen(false);
+            setProductToEdit(null);
+            await loadData();
+          }
+        }}
+      />
     </div>
   );
 }

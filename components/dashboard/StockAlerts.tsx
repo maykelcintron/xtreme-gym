@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { AlertTriangle, ArrowRight, Package } from "lucide-react";
+import Link from "next/link"; // Importamos Link para que funcione la flecha
 
 interface Product {
   id: string;
@@ -13,7 +14,6 @@ interface StockAlertProps {
 }
 
 const StockAlert = ({ products }: StockAlertProps) => {
-  // Si no hay productos en absoluto, no mostramos nada
   if (products.length === 0) return null;
 
   return (
@@ -60,9 +60,15 @@ const StockAlert = ({ products }: StockAlertProps) => {
                   Unidades
                 </p>
               </div>
-              <div className="p-2 bg-slate-50 rounded-xl text-slate-300 group-hover:bg-slate-900 group-hover:text-white transition-all">
+
+              {/* Mantenemos el div con todas tus clases de animación y colores */}
+              {/* Le añadimos el Link adentro para que toda la flecha sea clickable */}
+              <Link
+                href={`/dashboard/inventario`}
+                className="p-2 bg-slate-50 rounded-xl text-slate-300 group-hover:bg-slate-900 group-hover:text-white transition-all cursor-pointer shadow-sm active:scale-95"
+              >
                 <ArrowRight size={16} />
-              </div>
+              </Link>
             </div>
           </div>
         ))}

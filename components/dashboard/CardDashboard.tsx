@@ -4,7 +4,7 @@ import { Archive, AlertTriangle, DollarSign, LayoutGrid } from "lucide-react";
 
 interface CardDashboardProps {
   title: string;
-  count: string | number; // Cambiado para aceptar strings como "$1,200"
+  count: string | number;
   icon: "archive" | "warning" | "money" | "categories";
   color: "red" | "yellow" | "green" | "blue";
 }
@@ -40,14 +40,15 @@ const colorMap = {
 };
 
 const CardDashboard = ({ title, count, icon, color }: CardDashboardProps) => {
+  // Fallback a azul si el color proporcionado no existe
   const styles = colorMap[color] || colorMap.blue;
 
   return (
     <div
-      className={`bg-white p-6 rounded-xl shadow-sm border-l-[6px] flex justify-between items-center w-full ${styles.border}`}
+      className={`bg-white p-6 rounded-[2rem] shadow-sm border-l-[6px] flex justify-between items-center w-full transition-all hover:shadow-md ${styles.border}`}
     >
       <div className="flex flex-col gap-1">
-        <p className="text-gray-400 font-black uppercase text-[10px] tracking-widest">
+        <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.15em]">
           {title}
         </p>
         <h1 className={`font-black text-3xl tracking-tighter ${styles.text}`}>
@@ -55,7 +56,11 @@ const CardDashboard = ({ title, count, icon, color }: CardDashboardProps) => {
         </h1>
       </div>
 
-      <div className={`p-4 rounded-2xl ${styles.bgIcon}`}>{iconMap[icon]}</div>
+      <div
+        className={`p-4 rounded-2xl flex items-center justify-center ${styles.bgIcon}`}
+      >
+        {iconMap[icon]}
+      </div>
     </div>
   );
 };
