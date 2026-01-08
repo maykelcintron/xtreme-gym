@@ -1,0 +1,81 @@
+xtreme-gym/
+├── .dockerignore
+├── .env.template
+├── .gitignore
+├── README.md
+├── auth.config.ts
+├── components.json
+├── docker-compose.yml
+├── Dockerfile
+├── eslint.config.mjs
+├── next.config.ts
+├── package.json
+├── package-lock.json
+├── postcss.config.mjs
+├── prisma.config.ts
+├── tsconfig.json
+├── schema/
+│   └── user.ts
+├── interfaces/
+│   └── index.ts
+├── constants/
+│   └── index.ts
+├── components/
+│   ├── Inventory/
+│   │   ├── InventoryHeader.tsx
+│   │   ├── InventoryTable.tsx
+│   │   └── Pagination.tsx
+├── actions/
+│   ├── actions.ts
+│   └── logout.ts
+├── lib/
+│   ├── prisma.ts
+│   └── utils.ts
+├── public/
+│   ├── background.jpg
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── logo.jpeg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── components/
+│   ├── auth/
+│   │   ├── AuthForm.tsx
+│   │   ├── InputField.tsx
+│   │   ├── LinkNavigation.tsx
+│   │   ├── LoginForm.tsx
+│   │   └── RegisterForm.tsx
+│   ├── dashboard/
+│   │   ├── CardDashboard.tsx
+│   │   ├── CategoryProgress.tsx
+│   │   ├── QuickActions.tsx
+│   │   ├── RecentMovements.tsx
+│   │   └── StockAlerts.tsx
+│   └── navbar/
+│       ├── ActiveLink.module.css (modified)
+│       ├── ActiveLink.tsx
+│       └── Navbar.tsx (modified)
+├── app/
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── not-found.tsx
+│   ├── page.tsx
+│   └── auth/
+│       ├── layout.tsx
+│       ├── login/
+│       │   └── page.tsx
+│       └── register/
+│           └── page.tsx
+├── prisma/
+│   ├── schema.prisma
+│   ├── seed.ts
+│   ├── data/
+│   │   └── data.ts
+│   └── migrations/
+│       ├── migration_lock.toml
+│       └── 20260106233523_users_products_category_create_tables/
+│           └── migration.sql
+└── README.md (project root copy)
+

@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  // Corregido: El provider debe ser este para JS/TS
+  provider = "prisma-client-js" 
   output   = "../app/generated/prisma"
 }
 
@@ -18,18 +19,26 @@ enum Role {
   USER
 }
 
-// 1. Modelo de Usuarios
 model User {
   id        String   @id @default(uuid())
-  name      String
+  name      String?
   email     String   @unique
   password  String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("users")
 }
 
-// 3. Modelo de Productos
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  products Product[]
+
+  @@map("categories")
+}
+
 model Product {
   id          String   @id @default(uuid())
   name        String
@@ -39,14 +48,8 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relación con Categoría
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
-}
 
-// 4. Modelo de Categoría
-model Category {
-  id       String    @id @default(uuid())
-  name     String    @unique // Ej: "Suplementos", "Bebidas", "Snacks"
-  products Product[]  
+  @@map("products")
 }
