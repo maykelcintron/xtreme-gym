@@ -14,13 +14,6 @@ export const cardDashboard = [
     color: "yellow",
   },
   {
-    id: 3,
-    title: "VENTAS HOY",
-    count: 82.5,
-    icon: "<CreditCardIcon size={16} />",
-    color: "green",
-  },
-  {
     id: 4,
     title: "CATEGORIAS",
     count: 6,
@@ -64,7 +57,7 @@ export const movimientosRecientes = [
   },
 ];
 
-import { PlusSquare, ShoppingCart, ScanLine, FileText } from "lucide-react";
+import { PlusSquare } from "lucide-react";
 export const accionesRapidas = [
   {
     id: 1,
@@ -72,27 +65,6 @@ export const accionesRapidas = [
     icon: PlusSquare,
     color: "text-red-600",
     bg: "bg-red-50",
-  },
-  {
-    id: 2,
-    label: "Registrar Venta",
-    icon: ShoppingCart,
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-  },
-  {
-    id: 3,
-    label: "Escanear",
-    icon: ScanLine,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-  },
-  {
-    id: 4,
-    label: "Reportes",
-    icon: FileText,
-    color: "text-purple-600",
-    bg: "bg-purple-50",
   },
 ];
 
@@ -116,4 +88,31 @@ export const inventarioCategorias = [
   { id: 2, nombre: "Bebidas", porcentaje: 25, color: "bg-blue-400" },
   { id: 3, nombre: "Ropa Deportiva", porcentaje: 20, color: "bg-purple-500" },
   { id: 4, nombre: "Accesorios", porcentaje: 10, color: "bg-amber-500" },
+];
+
+export const productosInventario = [
+  {
+    id: "1", // Prisma suele usar Strings (UUID)
+    name: "Suero de Leche Gold Standard",
+    category: "Suplementos", // Usaremos category en lugar de categoria
+    price: 59.99,
+    stock: 45,
+    isActive: true, // En lugar de "En Stock"
+  },
+  {
+    id: "2",
+    name: "Juego de Bandas de Resistencia",
+    category: "Equipo",
+    price: 24.5,
+    stock: 12,
+    isActive: true,
+  },
+  {
+    id: "3",
+    name: "Explosión Pre-Entrenamiento",
+    category: "Suplementos",
+    price: 35.0,
+    stock: 0,
+    isActive: false, // En lugar de "Agotado"
+  },
 ];

@@ -1,24 +1,22 @@
+"use client";
 import React from "react";
-import { Archive, AlertTriangle, CreditCard, LayoutGrid } from "lucide-react";
+import { Archive, AlertTriangle, DollarSign, LayoutGrid } from "lucide-react";
 
 interface CardDashboardProps {
   title: string;
-  count: number;
-  icon: string;
-  color: string;
+  count: string | number;
+  icon: "archive" | "warning" | "money" | "categories";
+  color: "red" | "yellow" | "green" | "blue";
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  "<ArchiveIcon size={16} />": <Archive size={20} />,
-  "<AlertIcon size={16} />": <AlertTriangle size={20} />,
-  "<CreditCardIcon size={16} />": <CreditCard size={20} />,
-  "<StackIcon size={16} />": <LayoutGrid size={20} />,
+  archive: <Archive size={24} />,
+  warning: <AlertTriangle size={24} />,
+  money: <DollarSign size={24} />,
+  categories: <LayoutGrid size={24} />,
 };
 
-const colorMap: Record<
-  string,
-  { border: string; text: string; bgIcon: string }
-> = {
+const colorMap = {
   red: {
     border: "border-red-500",
     text: "text-slate-800",
@@ -26,7 +24,7 @@ const colorMap: Record<
   },
   yellow: {
     border: "border-amber-500",
-    text: "text-amber-500",
+    text: "text-slate-800",
     bgIcon: "bg-amber-50 text-amber-500",
   },
   green: {
@@ -42,22 +40,27 @@ const colorMap: Record<
 };
 
 const CardDashboard = ({ title, count, icon, color }: CardDashboardProps) => {
+  // Fallback a azul si el color proporcionado no existe
   const styles = colorMap[color] || colorMap.blue;
 
   return (
     <div
-      className={`bg-white p-6 rounded-xl shadow-sm border-l-[6px] flex justify-between items-center w-full ${styles.border}`}
+      className={`bg-white p-6 rounded-[2rem] shadow-sm border-l-[6px] flex justify-between items-center w-full transition-all hover:shadow-md ${styles.border}`}
     >
       <div className="flex flex-col gap-1">
-        <p className="text-gray-400 font-bold text-xs tracking-wider">
+        <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.15em]">
           {title}
         </p>
-        <h1 className={`font-extrabold text-3xl ${styles.text}`}>
-          {title === "VENTAS HOY" ? `$${count}` : count}
+        <h1 className={`font-black text-3xl tracking-tighter ${styles.text}`}>
+          {count}
         </h1>
       </div>
 
-      <div className={`p-3 rounded-full ${styles.bgIcon}`}>{iconMap[icon]}</div>
+      <div
+        className={`p-4 rounded-2xl flex items-center justify-center ${styles.bgIcon}`}
+      >
+        {iconMap[icon]}
+      </div>
     </div>
   );
 };

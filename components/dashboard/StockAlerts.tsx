@@ -1,47 +1,75 @@
+"use client";
 import React from "react";
-import { alertasStock } from "@/constants";
-import { AlertTriangle, Box } from "lucide-react";
+import { AlertTriangle, ArrowRight, Package } from "lucide-react";
+import Link from "next/link"; // Importamos Link para que funcione la flecha
 
-const colorStyles: Record<string, string> = {
-  red: "bg-red-50 border-red-100 text-red-600",
-  yellow: "bg-amber-50 border-amber-100 text-amber-600",
-};
+interface Product {
+  id: string;
+  name: string;
+  stock: number;
+}
 
-const StockAlerts = () => {
+interface StockAlertProps {
+  products: Product[];
+}
+
+const StockAlert = ({ products }: StockAlertProps) => {
+  if (products.length === 0) return null;
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm">
-      <div className="flex items-center gap-2 mb-6">
-        <AlertTriangle className="text-amber-500" size={20} />
-        <h2 className="font-bold text-slate-700 uppercase text-xs tracking-wider">
-          Alertas de Stock Bajo
-        </h2>
+    <div className="mt-8 space-y-4">
+      <div className="flex items-center gap-2 px-2">
+        <div className="p-1.5 bg-amber-100 rounded-lg">
+          <AlertTriangle className="text-amber-600" size={16} />
+        </div>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+          Próximos a agotar / Menor Stock
+        </h3>
       </div>
 
-      <div className="flex flex-col gap-4">
-        {alertasStock.map((alerta) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {products.map((p) => (
           <div
-            key={alerta.id}
-            className={`flex items-center justify-between p-4 rounded-xl border ${
-              colorStyles[alerta.color]
-            }`}
+            key={p.id}
+            className="bg-white border border-slate-200 rounded-2xl p-5 flex justify-between items-center shadow-sm hover:border-amber-200 transition-all group"
           >
             <div className="flex items-center gap-4">
-              <div className="bg-white p-2 rounded-lg shadow-sm">
-                <Box size={18} />
+              <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-amber-50 group-hover:text-amber-600 transition-colors">
+                <Package size={20} />
               </div>
-              <div>
-                <h4 className="font-bold text-sm text-slate-800">
-                  {alerta.producto}
-                </h4>
-                <p className="text-xs font-medium opacity-80">
-                  {alerta.mensaje}
-                </p>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-slate-700">
+                  {p.name}
+                </span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">
+                  Producto en inventario
+                </span>
               </div>
             </div>
 
-            <button className="bg-white text-slate-700 px-4 py-2 rounded-lg text-xs font-bold shadow-sm border border-slate-100 hover:bg-slate-50 transition-colors">
-              Reordenar
-            </button>
+            <div className="flex items-center gap-6">
+              <div className="text-right">
+                <p
+                  className={`text-xl font-black leading-none ${
+                    p.stock <= 5 ? "text-red-600" : "text-slate-800"
+                  }`}
+                >
+                  {p.stock}
+                </p>
+                <p className="text-[9px] font-bold text-slate-400 uppercase mt-1">
+                  Unidades
+                </p>
+              </div>
+
+              {/* Mantenemos el div con todas tus clases de animación y colores */}
+              {/* Le añadimos el Link adentro para que toda la flecha sea clickable */}
+              <Link
+                href={`/dashboard/inventario`}
+                className="p-2 bg-slate-50 rounded-xl text-slate-300 group-hover:bg-slate-900 group-hover:text-white transition-all cursor-pointer shadow-sm active:scale-95"
+              >
+                <ArrowRight size={16} />
+              </Link>
+            </div>
           </div>
         ))}
       </div>
@@ -49,4 +77,4 @@ const StockAlerts = () => {
   );
 };
 
-export default StockAlerts;
+export default StockAlert;

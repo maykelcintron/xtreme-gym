@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  // Corregido: El provider debe ser este para JS/TS
+  provider = "prisma-client-js" 
   output   = "../app/generated/prisma"
 }
 
@@ -60,7 +61,7 @@ model User {
   role Role     @default(USER)
   accounts      Account[]
   sessions      Session[]
-
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -85,7 +86,6 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relación con Categoría
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id])
 
