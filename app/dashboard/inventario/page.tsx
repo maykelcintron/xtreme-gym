@@ -96,7 +96,7 @@ export default function InventoryPage() {
 
       <main className="flex-1 p-4 md:p-8 pt-20 md:pt-8 w-full">
         <div className="max-w-1600px mx-auto space-y-6">
-          <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <InventoryHeader
               categories={categories}
               currentCategory={categoryFilter}

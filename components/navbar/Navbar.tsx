@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import ActiveLink from "./ActiveLink";
-import { logout } from "@/actions/logout";
+import { logout } from "../../actions/auth/logout";
 import { Menu, X } from "lucide-react";
 
 const navItems = [

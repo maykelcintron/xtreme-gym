@@ -104,7 +104,7 @@ export default async function DashboardPage() {
 
             {/* COLUMNA IZQUIERDA: Tablas y Alertas detalladas */}
             <div className="lg:col-span-2 space-y-6 md:space-y-8 order-2 lg:order-1">
-              <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <RecentMovements movements={movimientosReales} />
               </div>
 

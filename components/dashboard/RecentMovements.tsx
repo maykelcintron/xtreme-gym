@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import { Package, CheckCircle2, XCircle } from "lucide-react";
 
 interface ProductMovement {
@@ -17,11 +16,11 @@ interface RecentMovementsProps {
 
 const RecentMovements = ({ movements }: RecentMovementsProps) => {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="p-6 border-b border-slate-100 flex justify-between items-center">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
           Estado del Inventario Real
-        </h3>
+        </h3> 
       </div>
 
       {/* Contenedor con scroll horizontal para evitar que se rompa en móvil */}

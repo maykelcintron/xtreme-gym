@@ -24,6 +24,7 @@ export default function DashboardClientWrapper({
       <QuickActions onOpenPanel={() => setIsPanelOpen(true)} />
       {isPanelOpen && (
         <ProductSidePanel
+          isOpen={isPanelOpen}
           categories={categories}
           onClose={() => setIsPanelOpen(false)}
           onSave={handleSave}

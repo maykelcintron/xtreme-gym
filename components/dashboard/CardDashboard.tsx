@@ -45,7 +45,7 @@ const CardDashboard = ({ title, count, icon, color }: CardDashboardProps) => {
 
   return (
     <div
-      className={`bg-white p-6 rounded-[2rem] shadow-sm border-l-[6px] flex justify-between items-center w-full transition-all hover:shadow-md ${styles.border}`}
+      className={`bg-white p-6 rounded-xl shadow-sm border-l-[6px] flex justify-between items-center w-full transition-all hover:shadow-md ${styles.border}`}
     >
       <div className="flex flex-col gap-1">
         <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.15em]">
