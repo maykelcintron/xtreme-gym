@@ -64,7 +64,7 @@ const StockAlert = ({ products }: StockAlertProps) => {
               {/* Mantenemos el div con todas tus clases de animación y colores */}
               {/* Le añadimos el Link adentro para que toda la flecha sea clickable */}
               <Link
-                href={`/dashboard/inventario`}
+                href={`/dashboard/inventory`}
                 className="p-2 bg-slate-50 rounded-xl text-slate-300 group-hover:bg-slate-900 group-hover:text-white transition-all cursor-pointer shadow-sm active:scale-95"
               >
                 <ArrowRight size={16} />

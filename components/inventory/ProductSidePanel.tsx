@@ -13,6 +13,7 @@ import {
   Layers,
   ShoppingBag,
   Loader2,
+  ShieldAlert,
 } from "lucide-react";
 
 interface ProductSidePanelProps {
@@ -20,7 +21,8 @@ interface ProductSidePanelProps {
   categories: string[];
   productToEdit?: any;
   onClose: () => void;
-  onSave: (data: any) => Promise<void>; // Cambiado a Promise para manejar el loading
+  // Ahora devuelve la respuesta del Action
+  onSave: (data: any) => Promise<{ success: boolean; message?: string }>;
 }
 
 const ProductSidePanel = ({
@@ -33,6 +35,7 @@ const ProductSidePanel = ({
   const isEditing = !!productToEdit;
   const [isActive, setIsActive] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (isEditing) {
@@ -40,12 +43,14 @@ const ProductSidePanel = ({
     } else {
       setIsActive(true);
     }
+    setErrorMsg(null); // Resetear error al abrir
   }, [productToEdit, isEditing, isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMsg(null);
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
@@ -58,12 +63,19 @@ const ProductSidePanel = ({
     };
 
     try {
-      await onSave(data);
-      // El cierre lo maneja el padre tras el éxito, pero reseteamos aquí por si acaso
-      setIsSubmitting(false);
+      const result = await onSave(data);
+
+      if (result && !result.success) {
+        // Si el action devuelve un error (duplicado, negativo, etc)
+        setErrorMsg(result.message || "Error al procesar la solicitud");
+        setIsSubmitting(false);
+      } else {
+        // Éxito: El padre cerrará el panel
+        setIsSubmitting(false);
+      }
     } catch (error) {
+      setErrorMsg("Error de conexión con el servidor");
       setIsSubmitting(false);
-      console.error("Error al guardar:", error);
     }
   };
 
@@ -109,7 +121,32 @@ const ProductSidePanel = ({
         </div>
 
         {/* FORM BODY */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-8">
+        <div className="flex-1 overflow-y-auto p-8 space-y-8 relative">
+          {/* MINI MODAL DE ERROR */}
+          {errorMsg && (
+            <div className="absolute inset-0 z-[160] flex items-center justify-center p-8">
+              <div className="absolute inset-0 bg-white/90 backdrop-blur-md" />
+              <div className="relative bg-white w-full rounded-[2.5rem] p-8 shadow-2xl border-2 border-red-50 text-center animate-in zoom-in duration-300">
+                <div className="w-16 h-16 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <ShieldAlert size={32} />
+                </div>
+                <h4 className="text-sm font-black uppercase text-slate-800 mb-2 tracking-tighter">
+                  Acción Denegada
+                </h4>
+                <p className="text-[10px] font-bold text-slate-400 uppercase leading-relaxed mb-8">
+                  {errorMsg}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setErrorMsg(null)}
+                  className="w-full py-4 bg-slate-900 text-white text-[10px] font-black uppercase rounded-2xl hover:bg-black transition-all shadow-xl shadow-slate-200"
+                >
+                  Corregir Datos
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* VISIBILIDAD */}
           <section className="space-y-3">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -209,6 +246,7 @@ const ProductSidePanel = ({
                     name="price"
                     type="number"
                     step="0.01"
+                    min="1"
                     defaultValue={productToEdit?.price || ""}
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-black outline-none focus:border-emerald-500 transition-all"
                   />
@@ -227,6 +265,7 @@ const ProductSidePanel = ({
                     required
                     name="stock"
                     type="number"
+                    min="1"
                     defaultValue={productToEdit?.stock || ""}
                     className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-black outline-none focus:border-amber-500 transition-all"
                   />

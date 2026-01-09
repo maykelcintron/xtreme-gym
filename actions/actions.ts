@@ -1,8 +1,7 @@
 "use server";
 
 import { signIn } from "@/auth.config";
-import { AuthError } from "next-auth";
-import prisma from "@/lib/prisma"; // Asegúrate que en lib/prisma.ts sea "export default prisma"
+import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
@@ -17,14 +16,10 @@ export async function authenticate(
       ...Object.fromEntries(formData),
       redirect: false,
     });
-
     return "Success";
-
-
   } catch (error) {
-      console.log(error);
-      return 'Invalid credentials';   
-      
+    console.log(error);
+    return "Invalid credentials";
   }
 }
 
@@ -37,7 +32,7 @@ export async function getUsersAction() {
         id: true,
         name: true,
         email: true,
-        role: true, // Asegúrate de que existe en tu schema.prisma
+        role: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
@@ -51,17 +46,13 @@ export async function getUsersAction() {
 
 export async function createUserAction(formData: any) {
   try {
-    // 1. Verificación de seguridad básica
     if (!formData.password || !formData.email) {
       return { success: false, message: "Email y contraseña son requeridos" };
     }
 
-    // 2. Encriptar la contraseña (Aquí es donde daba el error)
-    // Usamos bcryptjs que importamos arriba
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(formData.password, salt);
 
-    // 3. Crear en la base de datos
     await prisma.user.create({
       data: {
         name: formData.name,
@@ -74,8 +65,6 @@ export async function createUserAction(formData: any) {
     revalidatePath("/dashboard/accounts");
     return { success: true };
   } catch (error: any) {
-    console.error("Error creando usuario:", error);
-    // Manejo de error de email duplicado (P2002 es el código de Prisma para Unique Constraint)
     if (error.code === "P2002") {
       return { success: false, message: "Este correo ya está registrado." };
     }
@@ -100,7 +89,6 @@ export async function getInventoryAction() {
       })),
     };
   } catch (error) {
-    console.error("Error al obtener inventario:", error);
     return { success: false, error: "No se pudo cargar el inventario" };
   }
 }
@@ -113,37 +101,43 @@ export async function getCategoriesAction() {
     });
     return { success: true, data: categories.map((c) => c.name) };
   } catch (error) {
-    console.error("Error al obtener categorías:", error);
     return { success: false, data: [] };
   }
 }
 
 export async function createCategoryAction(name: string) {
   try {
-    const newCategory = await prisma.category.create({
-      data: { name: name.trim() },
+    const trimmedName = name.trim();
+
+    // Validar si ya existe la categoría (insensible a mayúsculas)
+    const existing = await prisma.category.findFirst({
+      where: { name: { equals: trimmedName, mode: "insensitive" } },
     });
 
-    revalidatePath("/dashboard/inventario"); // Corregido el path
-    revalidatePath("/dashboard");
+    if (existing) {
+      return { success: false, error: "La categoría ya existe." };
+    }
 
+    const newCategory = await prisma.category.create({
+      data: { name: trimmedName },
+    });
+
+    revalidatePath("/dashboard/inventory");
+    revalidatePath("/dashboard");
     return { success: true, data: newCategory };
   } catch (error) {
-    console.error("Error al crear categoría:", error);
     return { success: false, error: "No se pudo crear la categoría" };
   }
 }
 
 export async function deleteCategoryAction(name: string) {
   try {
-    // Esto borrará la categoría por su nombre único
     await prisma.category.delete({
       where: { name: name },
     });
-    revalidatePath("/dashboard/inventario");
+    revalidatePath("/dashboard/inventory");
     return { success: true };
   } catch (error) {
-    console.error("Error al borrar categoría:", error);
     return {
       success: false,
       message: "No puedes borrar una categoría que tiene productos asociados.",
@@ -153,10 +147,39 @@ export async function deleteCategoryAction(name: string) {
 
 export async function saveProductAction(data: any, id?: string) {
   try {
+    const price = parseFloat(data.price);
+    const stock = parseInt(data.stock);
+
+    // VALIDACIÓN: Solo números mayores a cero
+    if (price <= 0 || stock <= 0) {
+      return {
+        success: false,
+        message: "El precio y el stock deben ser mayores a cero (mínimo 1).",
+      };
+    }
+
+    // 2. VALIDACIÓN: Nombre duplicado (insensible a mayúsculas)
+    const duplicate = await prisma.product.findFirst({
+      where: {
+        name: {
+          equals: data.name.trim(),
+          mode: "insensitive", // Esto detecta "Proteina" igual que "proteina"
+        },
+        NOT: id ? { id: id } : undefined,
+      },
+    });
+
+    if (duplicate) {
+      return {
+        success: false,
+        message: `Ya existe un producto registrado con el nombre "${data.name.trim()}". Por favor, usa uno diferente.`,
+      };
+    }
+
     const payload = {
-      name: data.name,
-      price: parseFloat(data.price),
-      stock: parseInt(data.stock),
+      name: data.name.trim(),
+      price: price,
+      stock: stock,
       isActive: data.isActive,
       category: {
         connectOrCreate: {
@@ -180,23 +203,22 @@ export async function saveProductAction(data: any, id?: string) {
       });
     }
 
-    revalidatePath("/dashboard/inventario");
+    revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard");
     return { success: true };
   } catch (error) {
-    console.error("Error al guardar producto:", error);
-    return { success: false };
+    console.error(error);
+    return { success: false, message: "Error al guardar el producto." };
   }
 }
 
 export async function deleteProductAction(id: string) {
   try {
     await prisma.product.delete({ where: { id } });
-    revalidatePath("/dashboard/inventario");
+    revalidatePath("/dashboard/inventory");
     revalidatePath("/dashboard");
     return { success: true };
   } catch (error) {
-    console.error("Error al eliminar producto:", error);
     return { success: false };
   }
 }
@@ -223,7 +245,6 @@ export async function getDashboardStatsAction() {
       },
     };
   } catch (error) {
-    console.error("Error al obtener stats:", error);
     return { success: false };
   }
 }
@@ -249,7 +270,6 @@ export async function updateUserAction(id: string, formData: any) {
     revalidatePath("/dashboard/accounts");
     return { success: true };
   } catch (error: any) {
-    console.error("Error al actualizar usuario:", error);
     return {
       success: false,
       message:
@@ -265,7 +285,6 @@ export async function deleteUserAction(id: string) {
     revalidatePath("/dashboard/accounts");
     return { success: true };
   } catch (error: any) {
-    console.error("Error al eliminar usuario:", error);
     return {
       success: false,
       message: "Error al eliminar el registro.",
