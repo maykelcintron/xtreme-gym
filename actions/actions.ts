@@ -8,7 +8,6 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 
 // --- ACCIONES DE AUTENTICACIÓN ---
-
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData
