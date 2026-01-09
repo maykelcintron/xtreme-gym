@@ -1,7 +1,7 @@
 "use client"
 import { usePathname } from "next/navigation"
 import ActiveLink from "./ActiveLink"
-import { logout } from "@/actions/logout"
+import { logout } from "@/actions/auth/logout"
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard", icon: "M3 12h18M3 6h18M3 18h18" },

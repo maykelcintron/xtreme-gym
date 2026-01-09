@@ -1,25 +1,25 @@
 services:
   # Application service
-  app_xtreme_gym:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - 3000:3000
-    depends_on:
-      - db_xtreme_gym
+  # app_xtreme_gym:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - db_xtreme_gym
   
-  # pgAdmin service for database management
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "8080:80"
-    depends_on:
-      - db_xtreme_gym
+  # # pgAdmin service for database management
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - db_xtreme_gym
   
   # PostgreSQL database service
   db_xtreme_gym:

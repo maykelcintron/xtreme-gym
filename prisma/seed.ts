@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma"
-import {  users } from "./data/data"
+import { users, category, products } from "./data/data"
 
 async function main() {
     await prisma.user.deleteMany()
@@ -9,6 +9,14 @@ async function main() {
     await prisma.user.createMany({
         data: users
     })
+
+    await prisma.category.createMany({
+        data: category,
+    });
+
+    await prisma.product.createMany({
+        data: products,
+    });
 
     console.log( 'Seed ejecutado correctamente' );
 }
