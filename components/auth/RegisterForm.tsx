@@ -1,17 +1,28 @@
 import Image from "next/image";
-import Link from "next/link";
 import InputField from "./InputField";
 import { AuthFormData } from "@/interfaces";
 import LinkNavigation from "./LinkNavigation";
+import { registerUser } from "@/actions/auth/register";
+import { loginUser } from "@/actions/auth/login";
+import { useState } from "react";
+import SendEmailMessage from "./SendEmailMessage";
 
 const RegisterForm = ({register, handleSubmit, errors} : any) => {
+    const [error, setError] = useState<string>("");
 
-    // const onSubmit = (data: AuthFormData) => {
-    //     console.log("submit", data);
-    // };
+    const onSubmit = async (data: AuthFormData) => {
+        const { error } = await registerUser(data);
+
+        if(error) return setError(error);
+
+        const { email, password } = data;
+        
+        await loginUser(email, password);
+        window.location.href = '/dashboard';
+    };
 
     return (
-        <form className="bg-black p-4 rounded-md w-117.5 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-black p-4 rounded-md w-117.5 space-y-4">
             <div className="flex justify-center items-center">
                 <Image
                     src="/logo.jpeg"
@@ -20,6 +31,8 @@ const RegisterForm = ({register, handleSubmit, errors} : any) => {
                     alt="Logo"
                 />
             </div>
+
+            {error && <SendEmailMessage type="error" message={error} />}
 
             <InputField 
                 label="Usuario" 
