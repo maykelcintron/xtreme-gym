@@ -4,8 +4,14 @@ import Navbar from "@/components/navbar/Navbar";
 import UserSidePanel from "@/components/accounts/UserSidePanel";
 import { getUsersAction, deleteUserAction } from "@/actions/actions";
 import { UserPlus, Trash2, Edit2, Shield, AlertTriangle } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function AccountsPage() {
+  const {data: session} = useSession();
+
+  if(session?.user.role !== 'ADMIN') return redirect('/dashboard');
+
   const [users, setUsers] = useState<any[]>([]);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 

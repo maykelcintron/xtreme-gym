@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useSession } from 'next-auth/react';
 import ActiveLink from "./ActiveLink";
 import { logout } from "../../actions/auth/logout";
 import { Menu, X } from "lucide-react";
@@ -25,6 +25,9 @@ const navItems = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session } = useSession();
+
+  const filteredNavItems = navItems.filter(item => item.path !== '/dashboard/accounts' || session?.user?.role === 'ADMIN');
 
   return (
     <>
@@ -59,7 +62,7 @@ const Navbar = () => {
           <div className="h-12 md:hidden" />
 
           <nav className="space-y-1">
-            {navItems.map((item) => (
+            {filteredNavItems.map((item) => (
               <div key={item.path} onClick={() => setIsOpen(false)}>
                 <ActiveLink path={item.path}>
                   <div className="flex items-center gap-3 w-full">

@@ -1,4 +1,5 @@
 import { auth } from "@/auth.config";
+import { SessionProvider } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -13,7 +14,9 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
     
     return (
         <>
-            {children}
+            <SessionProvider>
+                {children}
+            </SessionProvider>
         </>
     );
 }

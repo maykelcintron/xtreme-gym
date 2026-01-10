@@ -11,6 +11,7 @@ export const authConfig: NextAuthConfig = {
   pages: {
     signIn: '/auth/login',
   },
+  // @ts-ignore
   adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
@@ -47,6 +48,7 @@ export const authConfig: NextAuthConfig = {
       // Si el usuario se acaba de loguear, pasamos su ID al token
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
@@ -54,6 +56,7 @@ export const authConfig: NextAuthConfig = {
       // Pasamos los datos del token a la sesión para que estén disponibles en el cliente
       if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     }

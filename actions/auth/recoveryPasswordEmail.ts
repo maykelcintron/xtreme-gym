@@ -36,7 +36,7 @@ export const recoveryPasswordEmail = async (email: string) => {
     });
 
     // Send recovery email
-    const resetPasswordLink = `http://localhost:3000/auth/set-password?token=${token}`;
+    const resetPasswordLink = `${process.env.DOMAIN_NAME}/auth/set-password?token=${token}`;
     const emailContent = `<p>Hola, has solicitado recuperar tu contraseña. Haz clic en el siguiente enlace para restablecerla:</p><a href="${resetPasswordLink}">Restablecer Contraseña</a>`;
 
     const resend = new Resend(process.env.RESEND_EMAIL_API_KEY)
