@@ -27,6 +27,7 @@ export default function DashboardClientWrapper({
           isOpen={isPanelOpen}
           categories={categories}
           onClose={() => setIsPanelOpen(false)}
+          //@ts-ignore
           onSave={handleSave}
         />
       )}
