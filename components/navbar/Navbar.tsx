@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useSession } from 'next-auth/react';
+import { useSession } from "next-auth/react";
 import ActiveLink from "./ActiveLink";
 import { logout } from "../../actions/auth/logout";
 import { Menu, X } from "lucide-react";
@@ -27,7 +27,12 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
 
-  const filteredNavItems = navItems.filter(item => item.path !== '/dashboard/accounts' || session?.user?.role === 'ADMIN');
+  const filteredNavItems = navItems.filter(
+    (item) =>
+      item.path !== "/dashboard/accounts" || session?.user?.role === "ADMIN"
+  );
+
+  const userInitial = session?.user?.name?.charAt(0) || "U";
 
   return (
     <>
@@ -50,7 +55,7 @@ const Navbar = () => {
       `}
       >
         <div>
-          {/* LOGO ESCRITORIO (Se oculta en móvil) */}
+          {/* LOGO ESCRITORIO */}
           <div className="hidden md:flex mb-2 -mt-4 px-2 flex-col items-center justify-center">
             <img
               src="/logo-removebg-preview.png"
@@ -88,8 +93,46 @@ const Navbar = () => {
         </div>
 
         {/* FOOTER DEL ASIDE */}
-        <div>
-          {/* LOGO MÓVIL (Solo aparece cuando isOpen es true en móvil) */}
+        <div className="space-y-6">
+          {/* PERFIL DE USUARIO LOGUEADO */}
+          {session?.user && (
+            <div className="px-2 py-4 border-t border-gray-800/50">
+              <div className="flex items-center gap-3">
+                {/* Lógica de imagen: Si tiene imagen de Google la muestra, si no, usa la inicial */}
+                {session.user.image ? (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    className="w-9 h-9 rounded-xl object-cover border border-gray-700 shadow-lg"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-xl bg-linear-to-br from-gray-700 to-gray-900 border border-gray-700 flex items-center justify-center text-white font-black text-sm shadow-lg">
+                    {userInitial}
+                  </div>
+                )}
+
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-sm font-bold text-white truncate leading-tight">
+                    {session.user.name}
+                  </span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        session.user.role === "ADMIN"
+                          ? "bg-indigo-500"
+                          : "bg-emerald-500"
+                      }`}
+                    />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-gray-500">
+                      {session.user.role}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* LOGO MÓVIL */}
           <div className="flex md:hidden mb-4 justify-start">
             <img
               src="/logo-removebg-preview.png"
@@ -106,7 +149,7 @@ const Navbar = () => {
               onClick={() => logout()}
               className="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-red-500 transition-colors group w-full"
             >
-              <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-red-500/10">
+              <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-red-500/10 transition-colors">
                 <svg
                   className="w-4 h-4"
                   fill="none"

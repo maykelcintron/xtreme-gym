@@ -3,19 +3,26 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/navbar/Navbar";
 import UserSidePanel from "@/components/accounts/UserSidePanel";
 import { getUsersAction, deleteUserAction } from "@/actions/actions";
-import { UserPlus, Trash2, Edit2, Shield, AlertTriangle } from "lucide-react";
+import {
+  UserPlus,
+  Trash2,
+  Edit2,
+  Shield,
+  AlertTriangle,
+  Lock,
+  Unlock,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 export default function AccountsPage() {
-  const {data: session} = useSession();
+  const { data: session } = useSession();
 
-  if(session?.user.role !== 'ADMIN') return redirect('/dashboard');
+  // Protección de ruta
+  if (session?.user.role !== "ADMIN") return redirect("/dashboard");
 
   const [users, setUsers] = useState<any[]>([]);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-
-  // Estados para edición y borrado
   const [userToEdit, setUserToEdit] = useState<any>(null);
   const [userToDelete, setUserToDelete] = useState<any>(null);
 
@@ -43,13 +50,14 @@ export default function AccountsPage() {
 
       <main className="flex-1 p-4 sm:p-6 md:p-8 pt-20 md:pt-8 w-full overflow-x-hidden">
         <div className="max-w-[1600px] mx-auto space-y-6 md:space-y-8">
+          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
             <div>
               <h1 className="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tight">
                 Gestión de Cuentas
               </h1>
               <p className="text-slate-500 text-xs md:text-sm font-medium">
-                Administra los accesos del sistema.
+                Administra los accesos y permisos del sistema.
               </p>
             </div>
 
@@ -66,7 +74,7 @@ export default function AccountsPage() {
 
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left min-w-[700px]">
+              <table className="w-full text-left min-w-[850px]">
                 <thead className="bg-slate-50/50 border-b border-slate-200">
                   <tr>
                     <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">
@@ -77,6 +85,9 @@ export default function AccountsPage() {
                     </th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">
                       Rol
+                    </th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">
+                      Acceso
                     </th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">
                       Acciones
@@ -91,7 +102,7 @@ export default function AccountsPage() {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs uppercase">
+                          <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-xs uppercase shadow-inner">
                             {user.name?.charAt(0)}
                           </div>
                           <span className="text-sm font-bold text-slate-700">
@@ -102,6 +113,8 @@ export default function AccountsPage() {
                       <td className="px-6 py-4 text-sm text-slate-500 italic font-medium">
                         {user.email}
                       </td>
+
+                      {/* Columna de ROL */}
                       <td className="px-6 py-4">
                         <div
                           className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border w-fit ${
@@ -116,6 +129,29 @@ export default function AccountsPage() {
                           </span>
                         </div>
                       </td>
+
+                      {/* NUEVA COLUMNA DE PERMISOS */}
+                      <td className="px-6 py-4">
+                        <div
+                          className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border w-fit ${
+                            user.permission === "PERMITTED"
+                              ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+                              : "bg-red-50 border-red-100 text-red-500"
+                          }`}
+                        >
+                          {user.permission === "PERMITTED" ? (
+                            <Unlock size={12} />
+                          ) : (
+                            <Lock size={12} />
+                          )}
+                          <span className="text-[10px] font-black uppercase tracking-tight">
+                            {user.permission === "PERMITTED"
+                              ? "Permitido"
+                              : "Denegado"}
+                          </span>
+                        </div>
+                      </td>
+
                       <td className="px-6 py-4">
                         <div className="flex justify-center gap-1">
                           <button
@@ -144,7 +180,7 @@ export default function AccountsPage() {
         </div>
       </main>
 
-      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
+      {/* MODAL DE BORRADO (Igual que antes) */}
       {userToDelete && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
@@ -182,10 +218,10 @@ export default function AccountsPage() {
         </div>
       )}
 
-      {/* PANEL LATERAL (CREAR/EDITAR) */}
+      {/* PANEL LATERAL ACTUALIZADO */}
       <UserSidePanel
         isOpen={isPanelOpen}
-        userToEdit={userToEdit} // Pasamos el usuario a editar
+        userToEdit={userToEdit}
         onClose={() => {
           setIsPanelOpen(false);
           setUserToEdit(null);

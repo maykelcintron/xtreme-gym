@@ -33,6 +33,7 @@ export async function getUsersAction() {
         name: true,
         email: true,
         role: true,
+        permission: true, // AÑADIDO: Ahora recuperamos el permiso de Prisma
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
@@ -59,6 +60,7 @@ export async function createUserAction(formData: any) {
         email: formData.email,
         password: hashedPassword,
         role: formData.role || "USER",
+        permission: formData.permission || "DENIED", // AÑADIDO: Guardar permiso
       },
     });
 
@@ -69,6 +71,51 @@ export async function createUserAction(formData: any) {
       return { success: false, message: "Este correo ya está registrado." };
     }
     return { success: false, message: "Error interno del servidor." };
+  }
+}
+
+// --- ACTUALIZAR USUARIO ---
+export async function updateUserAction(id: string, formData: any) {
+  try {
+    const data: any = {
+      name: formData.name,
+      email: formData.email,
+      role: formData.role,
+      permission: formData.permission, // AÑADIDO: Actualizar permiso
+    };
+
+    if (formData.password && formData.password.trim() !== "") {
+      data.password = await bcrypt.hash(formData.password, 10);
+    }
+
+    await prisma.user.update({
+      where: { id },
+      data,
+    });
+
+    revalidatePath("/dashboard/accounts");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error en updateUserAction:", error);
+    return {
+      success: false,
+      message:
+        "No se pudo actualizar el usuario. El correo podría estar duplicado.",
+    };
+  }
+}
+
+// --- ELIMINAR USUARIO ---
+export async function deleteUserAction(id: string) {
+  try {
+    await prisma.user.delete({ where: { id } });
+    revalidatePath("/dashboard/accounts");
+    return { success: true };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: "Error al eliminar el registro.",
+    };
   }
 }
 
@@ -109,7 +156,6 @@ export async function createCategoryAction(name: string) {
   try {
     const trimmedName = name.trim();
 
-    // Validar si ya existe la categoría (insensible a mayúsculas)
     const existing = await prisma.category.findFirst({
       where: { name: { equals: trimmedName, mode: "insensitive" } },
     });
@@ -150,7 +196,6 @@ export async function saveProductAction(data: any, id?: string) {
     const price = parseFloat(data.price);
     const stock = parseInt(data.stock);
 
-    // VALIDACIÓN: Solo números mayores a cero
     if (price <= 0 || stock <= 0) {
       return {
         success: false,
@@ -158,12 +203,11 @@ export async function saveProductAction(data: any, id?: string) {
       };
     }
 
-    // 2. VALIDACIÓN: Nombre duplicado (insensible a mayúsculas)
     const duplicate = await prisma.product.findFirst({
       where: {
         name: {
           equals: data.name.trim(),
-          mode: "insensitive", // Esto detecta "Proteina" igual que "proteina"
+          mode: "insensitive",
         },
         NOT: id ? { id: id } : undefined,
       },
@@ -246,48 +290,5 @@ export async function getDashboardStatsAction() {
     };
   } catch (error) {
     return { success: false };
-  }
-}
-
-// --- ACTUALIZAR USUARIO ---
-export async function updateUserAction(id: string, formData: any) {
-  try {
-    const data: any = {
-      name: formData.name,
-      email: formData.email,
-      role: formData.role,
-    };
-
-    if (formData.password && formData.password.trim() !== "") {
-      data.password = await bcrypt.hash(formData.password, 10);
-    }
-
-    await prisma.user.update({
-      where: { id },
-      data,
-    });
-
-    revalidatePath("/dashboard/accounts");
-    return { success: true };
-  } catch (error: any) {
-    return {
-      success: false,
-      message:
-        "No se pudo actualizar el usuario. El correo podría estar duplicado.",
-    };
-  }
-}
-
-// --- ELIMINAR USUARIO ---
-export async function deleteUserAction(id: string) {
-  try {
-    await prisma.user.delete({ where: { id } });
-    revalidatePath("/dashboard/accounts");
-    return { success: true };
-  } catch (error: any) {
-    return {
-      success: false,
-      message: "Error al eliminar el registro.",
-    };
   }
 }

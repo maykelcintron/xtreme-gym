@@ -1,6 +1,14 @@
 "use client";
 import { useState } from "react";
-import { X, User, Mail, Lock, ShieldCheck, Loader2 } from "lucide-react";
+import {
+  X,
+  User,
+  Mail,
+  Lock,
+  ShieldCheck,
+  Loader2,
+  Unlock,
+} from "lucide-react";
 import { createUserAction, updateUserAction } from "@/actions/actions";
 
 interface UserSidePanelProps {
@@ -9,7 +17,6 @@ interface UserSidePanelProps {
   userToEdit?: any;
 }
 
-// Definimos la estructura de lo que devuelven nuestras acciones de servidor
 interface ActionResponse {
   success: boolean;
   message?: string;
@@ -29,7 +36,6 @@ export default function UserSidePanel({
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
 
-    // Tipamos la respuesta para que TS reconozca "message"
     let res: ActionResponse;
 
     if (userToEdit) {
@@ -42,7 +48,6 @@ export default function UserSidePanel({
       onClose();
       (e.target as HTMLFormElement).reset();
     } else {
-      // Ahora TS sabe que message puede existir
       alert(res.message || "Ocurrió un error inesperado");
     }
     setLoading(false);
@@ -51,7 +56,7 @@ export default function UserSidePanel({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-100 flex justify-end">
+    <div className="fixed inset-0 z-[100] flex justify-end">
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
@@ -78,7 +83,10 @@ export default function UserSidePanel({
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6 flex-1">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 flex-1 overflow-y-auto pr-2 scrollbar-hide"
+          >
             <div className="space-y-5">
               {/* Nombre */}
               <div>
@@ -164,16 +172,37 @@ export default function UserSidePanel({
                   <select
                     name="role"
                     defaultValue={userToEdit?.role || "USER"}
-                    className="w-full pl-12 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black text-slate-700 outline-none appearance-none focus:ring-4 focus:ring-black/5 transition-all"
+                    className="w-full pl-12 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black text-slate-700 outline-none appearance-none focus:ring-4 focus:ring-black/5 transition-all cursor-pointer"
                   >
-                    <option value="USER">Usuario (Vendedor)</option>
+                    <option value="USER">Usuario</option>
                     <option value="ADMIN">Administrador</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* NUEVO CAMPO: Permisos (Enum Permission) */}
+              <div>
+                <label className="text-[10px] font-black uppercase text-slate-400 ml-1">
+                  Permisos de Acceso
+                </label>
+                <div className="relative mt-1">
+                  <Unlock
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"
+                    size={18}
+                  />
+                  <select
+                    name="permission"
+                    defaultValue={userToEdit?.permission || "DENIED"}
+                    className="w-full pl-12 pr-10 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-black text-slate-700 outline-none appearance-none focus:ring-4 focus:ring-black/5 transition-all cursor-pointer"
+                  >
+                    <option value="DENIED">DENEGADO</option>
+                    <option value="PERMITTED">PERMITIDO</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-8">
               <button
                 disabled={loading}
                 type="submit"
@@ -182,9 +211,9 @@ export default function UserSidePanel({
                 {loading ? (
                   <Loader2 className="animate-spin" size={18} />
                 ) : userToEdit ? (
-                  "Guardar Cambios"
+                  "Actualizar Usuario"
                 ) : (
-                  "Crear Usuario"
+                  "Confirmar y Crear"
                 )}
               </button>
             </div>
