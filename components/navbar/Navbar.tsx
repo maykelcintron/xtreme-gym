@@ -1,8 +1,7 @@
 "use client";
-import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 import ActiveLink from "./ActiveLink";
-import { logout } from "../../actions/auth/logout";
 import { Menu, X } from "lucide-react";
 
 const navItems = [
@@ -27,11 +26,14 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
 
-  const filteredNavItems = navItems.filter(
-    (item) =>
-      item.path !== "/dashboard/accounts" || session?.user?.role === "ADMIN"
-  );
+  useEffect(() => {
+    if (session?.user?.permission === 'DENIED') {
+      signOut({ callbackUrl: '/auth/login' });
+    }
+  }, [session]);
 
+  const filteredNavItems = navItems.filter((item) => item.path !== "/dashboard/accounts" || session?.user?.role === "ADMIN");
+  
   const userInitial = session?.user?.name?.charAt(0) || "U";
 
   return (
@@ -146,7 +148,7 @@ const Navbar = () => {
             <div className="mb-6 text-white text-xs">XTREME v1.0.0</div>
 
             <button
-              onClick={() => logout()}
+              onClick={() => signOut({ callbackUrl: '/auth/login' })}
               className="flex items-center gap-2 cursor-pointer text-gray-400 hover:text-red-500 transition-colors group w-full"
             >
               <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-red-500/10 transition-colors">
